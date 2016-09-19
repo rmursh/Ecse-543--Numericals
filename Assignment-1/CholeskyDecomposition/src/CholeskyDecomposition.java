@@ -1,4 +1,5 @@
 import java.util.*;
+
 /*
  * Class: CholeskyDecomposition
  * Description: Carries out and tests Cholesky Decomposition on SPD Matrices
@@ -13,9 +14,18 @@ public class CholeskyDecomposition
 	 */
 	public static void main(String[] args)
 	{
-	  double[][] decomposedMatrix =	choleskyDecompose(TestMatrices.test2);
-      System.out.println(Arrays.deepToString(matrixSolver(TestMatrices.test1, TestMatrices.test2B))+ " \n");
-      System.out.println(Arrays.deepToString(matrixTranspose(TestMatrices.test2))+ " \n");
+	  System.out.println("X1 = \n");
+	  matrixPrint(matrixSolver(TestMatrices.test1, TestMatrices.test1B));
+	  System.out.println("X2 = \n");
+	  matrixPrint(matrixSolver(TestMatrices.test2, TestMatrices.test2B));
+	  System.out.println("X3 = \n");
+	  matrixPrint(matrixSolver(TestMatrices.test3, TestMatrices.test3B));
+	  System.out.println("X4 = \n");
+	  matrixPrint(matrixSolver(TestMatrices.test4, TestMatrices.test4B));
+	  System.out.println("X5 = \n");
+	  matrixPrint(matrixSolver(TestMatrices.test5, TestMatrices.test5B));
+	  System.out.println("XManual = \n");
+	  matrixPrint(matrixSolver(TestMatrices.testManualMatA, TestMatrices.testManualMatB));
 	}
 	
 	/*
@@ -36,7 +46,7 @@ public class CholeskyDecomposition
 				double sum = 0;
 				for(int j = 0; j < k; j++)
 				{
-					sum += outputMatrix[i][j] * outputMatrix[k][j];
+					sum += outputMatrix[i][j]*outputMatrix[k][j];
 				}
 				if (i==k)
 				{
@@ -50,69 +60,94 @@ public class CholeskyDecomposition
 		}
 		return outputMatrix;
 	}
+	
+	/*
+	 * Name: matrixSolver()
+	 * Parameters: double[][], double[][]
+	 * Output : double[][]
+	 * Description: Solves the matrix equation AX=B using cholesky decomposition 
+	 */
 	public static double[][] matrixSolver(double[][] A, double[][] B)
 	{
+		double sum;
 		if(B.length != A.length)
 		{
 			System.out.println("Matrix row dimensions must agree.");
 		}
-		int aRowDimension = A.length;
-		int bColumnDimension = B[0].length;
-		double[][] X = new double[aRowDimension][bColumnDimension];
-		double[][] decomposedMatrix = choleskyDecompose(A);
-	    for (int k = 0; k < aRowDimension; k++)
-	    {
-	          for (int i = k+1; i < aRowDimension; i++)
-	          {
-	             for (int j = 0; j < bColumnDimension; j++)
-	             {
-	                X[i][j] -= X[k][j]*decomposedMatrix[i][k];
-	             }
-	          }
-	     }
+		int ARowDim = A.length;
+		int BColDim = B[0].length;
+		double[][] X = new double[ARowDim][BColDim];
+		double[][] U = choleskyDecompose(A);
+		double[][] Ut = matrixTranspose(U);
+		double[][] Y = new double[ARowDim][BColDim];
 		
-//		 for (int k = 0; k < aRowDimension; k++) 
-//		 {
-//	         for (int i = k+1; i < aRowDimension; i++) 
-//	         {
-//	            for (int j = 0; j < bColumnDimension; j++) 
-//	            {
-//	               X[i][j] -= X[k][j]*A[i][k];
-//	            }
-//	         }
-//	      } 
-//		 for (int k = aRowDimension-1; k >= 0; k--)
-//		 {
-//	         for (int j = 0; j < bColumnDimension; j++) 
-//	         {
-//	            X[k][j] /= A[k][k];
-//	         }
-//	         for (int i = 0; i < k; i++) 
-//	         {
-//	            for (int j = 0; j < aRowDimension; j++) 
-//	            {
-//	               X[i][j] -= X[k][j]*A[i][k];
-//	            }
-//	         }
-//	      }
+		//Solving for U*y= B
+		for(int k =0; k < BColDim; k++)
+		{
+			for(int i = 0; i < ARowDim; i++)
+			{
+				sum = 0.0; 
+				for(int j =0; j < i ; j++)
+				{
+					sum += U[i][j]*Y[j][k];
+				}
+			  Y[i][k] = (B[i][k]- sum)/U[i][i]; 
+			}
+			
+			//Solving for Ut*x = Y
+			for(int i = ARowDim - 1; i > -1 ; i--)
+			{
+				sum = 0.0;
+				for (int j = i + 1; j < ARowDim; j++)
+				{
+					sum += Ut[i][j]*X[j][k];
+				}
+			  X[i][k] = (Y[i][k]- sum)/(Ut[i][i]);	
+			}
+		}
 		return X;
 	}
-
+	
+	/*
+	 * Name: matrixTranspose()
+	 * Parameters: double[][]
+	 * Output : double[][]
+	 * Description: Transposes a matrix
+	 */
 	public static double[][] matrixTranspose(double[][] inputMatrix)
 	{
 		 int m = inputMatrix.length;
 		 int n = inputMatrix[0].length;
 
-		 double[][] trasposedMatrix = new double[n][m];
+		 double[][] transposedMatrix = new double[n][m];
 
 		    for(int x = 0; x < n; x++)
 		    {
 		        for(int y = 0; y < m; y++)
 		        {
-		            trasposedMatrix[x][y] = inputMatrix[y][x];
+		            transposedMatrix[x][y] = inputMatrix[y][x];
 		        }
 		    }
-
-		  return trasposedMatrix;
+		  return transposedMatrix;
+	}
+	
+	/*
+	 * Name: matrixPrint()
+	 * Parameters: double[][]
+	 * Output : void
+	 * Description: Prints a given Matrix
+	 */
+	public static void matrixPrint(double[][] matrix)
+	{
+		for (int i = 0; i < matrix.length; i++)
+		{
+		    for (int j = 0; j < matrix[i].length; j++) 
+		    {
+		        System.out.print(matrix[i][j] + "  ");
+		    }
+		    System.out.println();
+		    System.out.println();
+		}
+		System.out.println();
 	}
 }
