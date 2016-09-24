@@ -8,6 +8,8 @@ import java.io.*;
 public class CholeskyDecomposition 
 {
 	public static String path = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
+	private static boolean network = false;
+	private static boolean matrix = true;
 	/*
 	 * Name: main()
 	 * Parameters: String[]
@@ -30,9 +32,14 @@ public class CholeskyDecomposition
 	  System.out.println("XManual = \n");
 	  matrixPrint(matrixSolver(TestMatrices.testManualMatA, TestMatrices.testManualMatB));
 	  
-	  ExcelImport Worksheet = new ExcelImport(path);
-	  Worksheet.printExcelContent();
-	  Worksheet.endExcel();
+	  ExcelImport worksheet = new ExcelImport(path);
+      double[][] networks = matrixTranspose(worksheet.importNetworkBranches(network));
+      double[][] incidence = worksheet.importNetworkBranches(matrix);
+      if (incidence.length != networks.length)
+      {
+    	  System.out.println("Dimensions do not match! \n");
+      }
+      matrixPrint(matrixSolver(incidence, networks));
 	}
 	
 	/*
