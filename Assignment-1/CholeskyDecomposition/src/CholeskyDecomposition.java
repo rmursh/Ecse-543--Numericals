@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 /*
  * Class: CholeskyDecomposition
@@ -6,12 +7,14 @@ import java.util.*;
  */
 public class CholeskyDecomposition 
 {
+	public static String path = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
 	/*
 	 * Name: main()
 	 * Parameters: String[]
 	 * Output : void
 	 * Description: Main function.
 	 */
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args)
 	{
 	  System.out.println("X1 = \n");
@@ -26,6 +29,10 @@ public class CholeskyDecomposition
 	  matrixPrint(matrixSolver(TestMatrices.test5, TestMatrices.test5B));
 	  System.out.println("XManual = \n");
 	  matrixPrint(matrixSolver(TestMatrices.testManualMatA, TestMatrices.testManualMatB));
+	  
+	  ExcelImport Worksheet = new ExcelImport(path);
+	  Worksheet.printExcelContent();
+	  Worksheet.endExcel();
 	}
 	
 	/*
