@@ -29,6 +29,11 @@ public class ExcelImport {
 
 	}
 	
+	public XSSFWorkbook getWorkbook()
+	{
+		return this.workbook;
+	}
+	
 	private void endExcel()
 	{
 		try
@@ -77,20 +82,19 @@ public class ExcelImport {
 	        endExcel();
     }
     
-    public double[][] importNetworkBranches(boolean matrix)
+    public double[][] importNetworkBranches(int matrix)
     { 
     	XSSFSheet sheet;
-    	
     	int colNum;  
-    	if(!matrix)
+    	if((matrix%2) == 0)
     	{
-    		sheet = workbook.getSheetAt(NETWORK_BOOK);
-    		colNum = sheet.getRow(NETWORK_BOOK).getLastCellNum();
+    		sheet = workbook.getSheetAt(matrix);
+    		colNum = sheet.getRow(0).getLastCellNum();
     	}
     	else
     	{
-    		sheet = workbook.getSheetAt(MATRIX_BOOK);
-    		colNum = sheet.getRow(MATRIX_BOOK).getLastCellNum();
+    		sheet = workbook.getSheetAt(matrix);
+    		colNum = sheet.getRow(0).getLastCellNum();
     	}
     	int rowNum = sheet.getLastRowNum() + 1;
 
@@ -110,6 +114,7 @@ public class ExcelImport {
 	     }
     	endExcel();
     	return data;
+
     	
     }
 	 

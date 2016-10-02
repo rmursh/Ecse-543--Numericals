@@ -8,8 +8,9 @@ import java.io.*;
 public class CholeskyDecomposition 
 {
 	public static String path = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
-	private static boolean network = false;
-	private static boolean matrix = true;
+	private static int J = 0;
+	private static int R = 1;
+	private static int E = 2;
 	/*
 	 * Name: main()
 	 * Parameters: String[]
@@ -33,13 +34,40 @@ public class CholeskyDecomposition
 	  matrixPrint(matrixSolver(TestMatrices.testManualMatA, TestMatrices.testManualMatB));
 	  
 	  ExcelImport worksheet = new ExcelImport(path);
-      double[][] networks = matrixTranspose(worksheet.importNetworkBranches(network));
-      double[][] incidence = worksheet.importNetworkBranches(matrix);
-      if (incidence.length != networks.length)
+	  
+      for(int i = 0 ; i < worksheet.getWorkbook().getNumberOfSheets(); i = i+2)
       {
-    	  System.out.println("Dimensions do not match! \n");
+	      double[][] networks = worksheet.importNetworkBranches(i);
+	      double[][] A = worksheet.importNetworkBranches(i+1);
+	      double[][] At = matrixTranspose(A);
+	      double[][] Y = new double[A[0].length][A[0].length];
+	      double[][] Jk = new double[A[0].length][1], Rk = new double[A[0].length][1], Ek = new double[A[0].length][1];
+	      for(int j =0; j < Y.length ; j++)
+	      {
+	    	  for (int k = 0; k < Y[0].length; k++)
+	    	  {
+	    		  Jk[k][0] = networks[k][J];
+	    		  Rk[k][0] = networks[k][R];
+	    		  Ek[k][0] = networks[k][E];
+	    		  if(j == k)
+	    		  {
+	    			  Y[j][k] = 1.0/Rk[k][0];
+	    		  }
+	    		  else
+	    		  {
+	    			  Y[j][k] = 0;
+	    		  }
+	    	  } 
+	      }
+	      
+	      double[][] temp = multiplyMatrices(Y,At);
+	      double[][] SPD = multiplyMatrices(A,temp);
+	      double[][] temp2 = subtractMatrices(Jk,multiplyMatrices(Y,Ek));
+	      double[][] B = multiplyMatrices(A,temp2);
+	      System.out.println("The node voltages for circuit in ascending order are " + ((i/2)+1) + " are \n");
+	      matrixPrint(matrixSolver(SPD,B));
       }
-      matrixPrint(matrixSolver(incidence, networks));
+
 	}
 	
 	/*
@@ -164,4 +192,55 @@ public class CholeskyDecomposition
 		}
 		System.out.println();
 	}
+	
+	public static double[][] multiplyMatrices(double[][] A, double[][] B) {
+
+        int aRows = A.length;
+        int aColumns = A[0].length;
+        int bRows = B.length;
+        int bColumns = B[0].length;
+
+        if (aColumns != bRows) {
+            throw new IllegalArgumentException("A:Rows: " + aColumns + " did not match B:Columns " + bRows + ".");
+        }
+
+        double[][] C = new double[aRows][bColumns];
+        for (int i = 0; i < aRows; i++) {
+            for (int j = 0; j <bColumns; j++) {
+                C[i][j] = 0.00000;
+            }
+        }
+
+        for (int i = 0; i < aRows; i++) { // aRow
+            for (int j = 0; j < bColumns; j++) { // bColumn
+                for (int k = 0; k < aColumns; k++) { // aColumn
+                    C[i][j] += A[i][k] * B[k][j];
+                }
+            }
+        }
+
+        return C;
+    }
+	
+	private static double[][] subtractMatrices(double[][] matrixA, double[][] matrixB) 
+	{
+		int rows = matrixA.length;
+
+		int cols = matrixA[0].length;
+
+		double[][] sum = new double[rows][cols];
+
+		for (int i = 0; i < rows; i++) 
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				sum[i][j] = matrixA[i][j] - matrixB[i][j];
+
+			}
+		}
+
+		return sum;
+
+	}
+
 }
