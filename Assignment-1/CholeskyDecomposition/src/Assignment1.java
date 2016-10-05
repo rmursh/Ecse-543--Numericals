@@ -5,9 +5,10 @@ import java.io.*;
  * Class: CholeskyDecomposition
  * Description: Carries out and tests Cholesky Decomposition on SPD Matrices
  */
-public class CholeskyDecomposition 
+public class Assignment1 
 {
-	public static String path = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
+	public static String pathQ1 = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
+	private static int questionNum = 2;
 	private static int J = 0;
 	private static int R = 1;
 	private static int E = 2;
@@ -20,53 +21,100 @@ public class CholeskyDecomposition
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args)
 	{
-	  System.out.println("X1 = \n");
-	  matrixPrint(matrixSolver(TestMatrices.test1, TestMatrices.test1B));
-	  System.out.println("X2 = \n");
-	  matrixPrint(matrixSolver(TestMatrices.test2, TestMatrices.test2B));
-	  System.out.println("X3 = \n");
-	  matrixPrint(matrixSolver(TestMatrices.test3, TestMatrices.test3B));
-	  System.out.println("X4 = \n");
-	  matrixPrint(matrixSolver(TestMatrices.test4, TestMatrices.test4B));
-	  System.out.println("X5 = \n");
-	  matrixPrint(matrixSolver(TestMatrices.test5, TestMatrices.test5B));
-	  System.out.println("XManual = \n");
-	  matrixPrint(matrixSolver(TestMatrices.testManualMatA, TestMatrices.testManualMatB));
-	  
-	  ExcelImport worksheet = new ExcelImport(path);
-	  
-      for(int i = 0 ; i < worksheet.getWorkbook().getNumberOfSheets(); i = i+2)
-      {
-	      double[][] networks = worksheet.importNetworkBranches(i);
-	      double[][] A = worksheet.importNetworkBranches(i+1);
-	      double[][] At = matrixTranspose(A);
-	      double[][] Y = new double[A[0].length][A[0].length];
-	      double[][] Jk = new double[A[0].length][1], Rk = new double[A[0].length][1], Ek = new double[A[0].length][1];
-	      for(int j =0; j < Y.length ; j++)
+		if(questionNum == 1)
+		{
+		  System.out.println("X1 = \n");
+		  matrixPrint(matrixSolver(TestMatrices.test1, TestMatrices.test1B));
+		  System.out.println("X2 = \n");
+		  matrixPrint(matrixSolver(TestMatrices.test2, TestMatrices.test2B));
+		  System.out.println("X3 = \n");
+		  matrixPrint(matrixSolver(TestMatrices.test3, TestMatrices.test3B));
+		  System.out.println("X4 = \n");
+		  matrixPrint(matrixSolver(TestMatrices.test4, TestMatrices.test4B));
+		  System.out.println("X5 = \n");
+		  matrixPrint(matrixSolver(TestMatrices.test5, TestMatrices.test5B));
+		  System.out.println("XManual = \n");
+		  matrixPrint(matrixSolver(TestMatrices.testManualMatA, TestMatrices.testManualMatB));
+		  
+		  ExcelImport worksheet = new ExcelImport(pathQ1);
+		  
+	      for(int i = 0 ; i < worksheet.getWorkbook().getNumberOfSheets(); i = i+2)
 	      {
-	    	  for (int k = 0; k < Y[0].length; k++)
-	    	  {
-	    		  Jk[k][0] = networks[k][J];
-	    		  Rk[k][0] = networks[k][R];
-	    		  Ek[k][0] = networks[k][E];
-	    		  if(j == k)
-	    		  {
-	    			  Y[j][k] = 1.0/Rk[k][0];
-	    		  }
-	    		  else
-	    		  {
-	    			  Y[j][k] = 0;
-	    		  }
-	    	  } 
+		      double[][] networks = worksheet.importNetworkBranches(i);
+		      double[][] A = worksheet.importNetworkBranches(i+1);
+		      double[][] At = matrixTranspose(A);
+		      double[][] Y = new double[A[0].length][A[0].length];
+		      double[][] Jk = new double[A[0].length][1], Rk = new double[A[0].length][1], Ek = new double[A[0].length][1];
+		      for(int j =0; j < Y.length ; j++)
+		      {
+		    	  for (int k = 0; k < Y[0].length; k++)
+		    	  {
+		    		  Jk[k][0] = networks[k][J];
+		    		  Rk[k][0] = networks[k][R];
+		    		  Ek[k][0] = networks[k][E];
+		    		  if(j == k)
+		    		  {
+		    			  Y[j][k] = 1.0/Rk[k][0];
+		    		  }
+		    		  else
+		    		  {
+		    			  Y[j][k] = 0;
+		    		  }
+		    	  } 
+		      }
+		      
+		      double[][] temp = multiplyMatrices(Y,At);
+		      double[][] SPD = multiplyMatrices(A,temp);
+		      double[][] temp2 = subtractMatrices(Jk,multiplyMatrices(Y,Ek));
+		      double[][] B = multiplyMatrices(A,temp2);
+		      System.out.println("The node voltages for circuit in ascending order are " + ((i/2)+1) + " are \n");
+		      matrixPrint(matrixSolver(SPD,B));
 	      }
-	      
-	      double[][] temp = multiplyMatrices(Y,At);
-	      double[][] SPD = multiplyMatrices(A,temp);
-	      double[][] temp2 = subtractMatrices(Jk,multiplyMatrices(Y,Ek));
-	      double[][] B = multiplyMatrices(A,temp2);
-	      System.out.println("The node voltages for circuit in ascending order are " + ((i/2)+1) + " are \n");
-	      matrixPrint(matrixSolver(SPD,B));
-      }
+		}
+		else if(questionNum == 2)
+		{
+			for (int num = 2; num <= 15; num++)
+			{
+				final long startTime = System.currentTimeMillis();
+				NetworkGenerator network = new NetworkGenerator(num);
+				double[][] tempA = network.getA();
+				double [][] A = new double[tempA.length-1][tempA[0].length];
+				for(int i = 0; i < tempA.length - 1; i++)
+				{
+					for(int j = 0; j < tempA[0].length; j++)
+					{
+						A[i][j] = tempA[i][j];
+					}	
+				}
+				double[][] At = matrixTranspose(A);
+				double[][] Y = new double[A[0].length][A[0].length];
+			    double[][] Jk = network.getJ(), Rk = network.getR(), Ek = network.getE();
+	
+			    for(int j =0; j < Y.length ; j++)
+			    {
+		    	  for (int k = 0; k < Y[0].length; k++)
+		    	  {
+		    		  if(j == k)
+		    		  {
+		    			  Y[j][k] = 1.0/Rk[k][0];
+		    		  }
+		    		  else
+		    		  {
+		    			  Y[j][k] = 0;
+		    		  }
+		    	  } 
+			    }
+			      double[][] temp = multiplyMatrices(Y,At);
+			      double[][] SPD = multiplyMatrices(A,temp);
+			      double[][] temp2 = subtractMatrices(Jk,multiplyMatrices(Y,Ek));
+			      double[][] B = multiplyMatrices(A,temp2);
+			      //System.out.println("The node voltages for circuit in ascending order are " + ((i/2)+1) + " are \n");
+			      double[][] Vk = matrixSolver(SPD,B);
+			      double R = (1.0f/((Ek[Ek.length - 1][0]/Vk[0][0])-1));
+			      final long endTime = System.currentTimeMillis();
+	              System.out.println("R is : " + R + " ohms for a " + num + " by " + num+ " mesh network and time taken is " + ((endTime-startTime)*1000) + " microseconds");
+			}
+		}
 
 	}
 	
