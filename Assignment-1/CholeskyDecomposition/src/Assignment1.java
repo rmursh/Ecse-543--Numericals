@@ -8,10 +8,11 @@ import java.io.*;
 public class Assignment1 
 {
 	public static String pathQ1 = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
-	private static int questionNum = 2;
-	private static int J = 0;
-	private static int R = 1;
-	private static int E = 2;
+	private static int questionNum = 3;
+	private static final int J = 0;
+	private static final int R = 1;
+	private static final int E = 2;
+	private static final double h = 0.02;
 	/*
 	 * Name: main()
 	 * Parameters: String[]
@@ -114,6 +115,19 @@ public class Assignment1
 			      final long endTime = System.currentTimeMillis();
 	              System.out.println("R is : " + R + " ohms for a " + num + " by " + num+ " mesh network and time taken is " + ((endTime-startTime)*1000) + " microseconds");
 			}
+		}
+		else if(questionNum == 3)
+		{
+			
+			//matrixPrint(fds.getMesh());
+			for(double x = 1; x < 2; x += 0.1)
+			{
+				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
+				int iterations = fds.solveSOR(x); 
+				double potential = fds.getPotentialAt(0.06, 0.04);
+				System.out.println("w: " + x + ", iterations: " + iterations + ", potential: " + potential + "\n");
+			}
+
 		}
 
 	}
