@@ -12,7 +12,8 @@ public class Assignment1
 	private static final int J = 0;
 	private static final int R = 1;
 	private static final int E = 2;
-	private static final double h = 0.02;
+
+	private static final double W = 1.25;
 	/*
 	 * Name: main()
 	 * Parameters: String[]
@@ -119,15 +120,31 @@ public class Assignment1
 		else if(questionNum == 3)
 		{
 			
-			//matrixPrint(fds.getMesh());
-			for(double x = 1; x < 2; x += 0.1)
-			{
-				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
-				int iterations = fds.solveSOR(x); 
-				double potential = fds.getPotentialAt(0.06, 0.04);
-				System.out.println("w: " + x + ", iterations: " + iterations + ", potential: " + potential + "\n");
-			}
+			//PART A
+//			for(double x = 1.2; x < 1.3; x += 0.01)
+//			{
+//				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
+//				int iterations = fds.solveSOR(x); 
+//				double potential = fds.getPotentialAt(0.06, 0.04);
+//			    System.out.println(x + "\t" + iterations);
+//				//System.out.println("w: " + x + ", iterations: " + iterations + ", potential: " + potential + "\n");
+//			}
+			//PART B
+//			for(double h = 0.02 ; h >= (double)(1/3200); h /= 2 )
+//			{
+//				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
+//				int iterations = fds.solveSOR(W); 
+//				double potential = fds.getPotentialAt(0.06, 0.04);
+//			    System.out.println(1/h + "\t" + iterations + "\t" + potential);
+//			}
+			//PART C
+			double[] horizontalLines = {0, 0.01, 0.2, 0.027, 0.032, 0.04, 0.052, 0.062, 0.072, 0.085, 0.093, 0.1};
+			double[] verticalLines = {0, 0.01, 0.02, 0.027, 0.033, 0.042, 0.052, 0.06, 0.072, 0.085,0.093, 0.1};
 
+			AdvancedDifferenceSolver fds = new AdvancedDifferenceSolver(horizontalLines, verticalLines);
+			int iterations = fds.solveSOR(W); 
+			double potential = fds.getPotentialAt(0.06, 0.04);
+		    System.out.println(iterations + "\t" + potential);
 		}
 
 	}

@@ -63,17 +63,26 @@ public class FiniteDifferenceSolver
 		int numIterations = 0;
 		//double maximumResidual = computeMaximumResidual(0);
 		//System.out.println(maximumResidual);
-		double residueOld  = iterateSOR(w);//mesh[(int)(0.06/h)][(int)(0.04/h)];
-		System.out.println(residueOld);
-		double residueNew = 0;
-		while (Math.abs(residueNew - residueOld)> MIN_RESIDUAL)
+		//double residueOld  = iterateSOR(w);//mesh[(int)(0.06/h)][(int)(0.04/h)];
+		while (computeMaximumResidual()> MIN_RESIDUAL)
 		{
-			residueOld = residueNew;
-			residueNew = iterateSOR(w);
+			//residueOld = residueNew;
+			iterateSOR(w);
 			numIterations++;
 			//maximumResidual = computeMaximumResidual(maximumResidual);
 		}
 		return numIterations+1;
+	}
+	
+	public int solveJacobi()
+	{
+		int iterations =0;
+		while(computeMaximumResidual()> MIN_RESIDUAL)
+		{
+			iterateJacobi();
+			iterations++;
+		}
+		return iterations;
 	}
 	
 	public double getPotentialAt(double x, double y)
@@ -83,7 +92,7 @@ public class FiniteDifferenceSolver
 		return mesh[xPoint][yPoint];
 	}
 	
-	private double iterateSOR(double w)
+	private void iterateSOR(double w)
 	{
 		for (int i = 1; i < nodesHigh - 1; i++)
 		{
@@ -99,10 +108,29 @@ public class FiniteDifferenceSolver
 				}
 			}
 		}
-		return mesh[(int)(0.06/h)][(int)(0.04/h)];
 	}
-	private double computeMaximumResidual(double maximumResidual)
+	
+	private void iterateJacobi()
 	{
+		double[][] oldMesh = mesh;
+		generateMesh();
+		for(int y = 1; y < this.nodesHigh - 1; y++)
+		{
+			for(int x = 1; x < this.nodesWide - 1; x++)
+			{
+				if((x > (CORE_WIDTH/h))||(y > (CORE_HEIGHT/h)))
+				{
+					mesh[y][x] = (1.0/4.0)*(oldMesh[y][x-1]
+							               +oldMesh[y][x+1] 
+							               + oldMesh[y-1][x] 
+							               + oldMesh[y+1][x]);
+				}
+			}
+		}	
+	}
+	private double computeMaximumResidual()
+	{
+		double maximumResidual =0;
 		for (int y = 1; y < nodesHigh - 1; y++)
 		{
 			for(int x = 1; x < nodesWide - 1; x++)
@@ -121,7 +149,8 @@ public class FiniteDifferenceSolver
 				}
 			}
 		}
-		return maximumResidual;	
+		return maximumResidual;
+
 	}
 	
 	
