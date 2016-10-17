@@ -8,10 +8,13 @@ import java.io.*;
 public class Assignment1 
 {
 	public static String pathQ1 = "C:\\Users\\rmursh\\workspace\\Ecse-543--Numericals\\Assignment-1\\Test.xlsx";
-	private static int questionNum = 3;
+	private static int questionNum = 21;
 	private static final int J = 0;
 	private static final int R = 1;
 	private static final int E = 2;
+	
+	public static double halfBandwidth = 0;
+	static ArrayList<Integer> firstNonZero = new ArrayList<Integer>();
 
 	private static final double W = 1.25;
 	/*
@@ -114,22 +117,24 @@ public class Assignment1
 			      double[][] Vk = matrixSolver(SPD,B);
 			      double R = (1.0f/((Ek[Ek.length - 1][0]/Vk[0][0])-1));
 			      final long endTime = System.currentTimeMillis();
-	              System.out.println("R is : " + R + " ohms for a " + num + " by " + num+ " mesh network and time taken is " + ((endTime-startTime)*1000) + " microseconds");
+	              System.out.println("R is : " + R + " Kohms for a " + num + " by " + num+ " mesh network and time taken is " + ((endTime-startTime)*1000) + " microseconds");
 			}
 		}
 		else if(questionNum == 3)
 		{
 			
-			//PART A
-//			for(double x = 1.2; x < 1.3; x += 0.01)
+//			//PART A 
+//			System.out.println("********** PART A *************");
+//			for(double x = 1; x < 2; x += 0.1)
 //			{
-//				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
+//				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(0.02);
 //				int iterations = fds.solveSOR(x); 
 //				double potential = fds.getPotentialAt(0.06, 0.04);
-//			    System.out.println(x + "\t" + iterations);
-//				//System.out.println("w: " + x + ", iterations: " + iterations + ", potential: " + potential + "\n");
+//			    //System.out.println(x + "\t" + iterations);
+//				System.out.println("w: " + x + ", iterations: " + iterations + ", potential: " + potential + "\n");
 //			}
-			//PART B
+//			//PART B
+//			System.out.println("********** PART B *************");
 //			for(double h = 0.02 ; h >= (double)(1/3200); h /= 2 )
 //			{
 //				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
@@ -137,14 +142,74 @@ public class Assignment1
 //				double potential = fds.getPotentialAt(0.06, 0.04);
 //			    System.out.println(1/h + "\t" + iterations + "\t" + potential);
 //			}
-			//PART C
-			double[] horizontalLines = {0, 0.01, 0.2, 0.027, 0.032, 0.04, 0.052, 0.062, 0.072, 0.085, 0.093, 0.1};
-			double[] verticalLines = {0, 0.01, 0.02, 0.027, 0.033, 0.042, 0.052, 0.06, 0.072, 0.085,0.093, 0.1};
-
+//			//PART C
+//			System.out.println("********** PART C *************");
+//			for(double h = 0.02 ; h > (double)(1/1600); h /= 2 )
+//			{
+//				FiniteDifferenceSolver fds = new FiniteDifferenceSolver(h);
+//				int iterations = fds.solveJacobi(); 
+//				double potential = fds.getPotentialAt(0.06, 0.04);
+//			    System.out.println(1/h + "\t" + iterations + "\t" + potential);
+//			}
+			//PART E
+			System.out.println("********** PART E *************");
+			double[] horizontalLines = new double[10];
+			double[] verticalLines = new double[10];
+			for (int i = 0; i < 10; i++)
+			{
+				horizontalLines[i] = (i+1)*0.01; 
+				verticalLines[i] = (i+1)*0.01;
+			}
 			AdvancedDifferenceSolver fds = new AdvancedDifferenceSolver(horizontalLines, verticalLines);
-			int iterations = fds.solveSOR(W); 
+			int iterations = fds.solveSOR(1.25); 
 			double potential = fds.getPotentialAt(0.06, 0.04);
-		    System.out.println(iterations + "\t" + potential);
+			System.out.println("Iterations: " + iterations + ", Potential: " + potential + "\n");
+		}
+		else if(questionNum == 21)
+		{
+			for (int num = 2; num <= 15; num++)
+			{
+				final long startTime = System.currentTimeMillis();
+				NetworkGenerator network = new NetworkGenerator(num);
+				double[][] tempA = network.getA();
+				double [][] A = new double[tempA.length-1][tempA[0].length];
+				for(int i = 0; i < tempA.length - 1; i++)
+				{
+					for(int j = 0; j < tempA[0].length; j++)
+					{
+						A[i][j] = tempA[i][j];
+					}	
+				}
+				double[][] At = matrixTranspose(A);
+				double[][] Y = new double[A[0].length][A[0].length];
+			    double[][] Jk = network.getJ(), Rk = network.getR(), Ek = network.getE();
+	
+			    for(int j =0; j < Y.length ; j++)
+			    {
+		    	  for (int k = 0; k < Y[0].length; k++)
+		    	  {
+		    		  if(j == k)
+		    		  {
+		    			  Y[j][k] = 1.0/Rk[k][0];
+		    		  }
+		    		  else
+		    		  {
+		    			  Y[j][k] = 0;
+		    		  }
+		    	  } 
+			    }
+			      double[][] temp = multiplyMatrices(Y,At);
+			      double[][] SPD = multiplyMatrices(A,temp);
+			      
+			      double[][] temp2 = subtractMatrices(Jk,multiplyMatrices(Y,Ek));
+			      double[][] B = multiplyMatrices(A,temp2);
+			      //System.out.println("The node voltages for circuit in ascending order are " + ((i/2)+1) + " are \n");
+			      double[][] Vk = sparseMatrixSolver(SPD,B);
+			      double R = (1.0f/((Ek[Ek.length - 1][0]/Vk[0][0])-1));
+			      final long endTime = System.currentTimeMillis();
+	              System.out.println("R is : " + R + " Kohms for a " + num + " by " + num+ " mesh network and time taken is " + ((endTime-startTime)*1000) + " microseconds");
+			}
+			
 		}
 
 	}
@@ -227,6 +292,97 @@ public class Assignment1
 			}
 		}
 		return X;
+	}
+	
+	public static double[][] sparseMatrixSolver(double[][] A, double[][] B)
+	{
+		int ARowDim = A.length;
+		int BColDim = B[0].length;
+		if(B.length != A.length)
+		{
+			System.out.println("Matrix row dimensions must agree.");
+		}
+		double[][] L = computeLMatrix(A);
+		double[][] Y = new double[ARowDim][BColDim];
+		double[][] X = new double[ARowDim][BColDim];
+		for (int k = 0; k < BColDim; k++)
+		{
+			for (int i = 1; i <= ARowDim  + 1; i++)
+			{
+				double sum =0;
+				for(int j = firstNonZero.get(i-1) + 1; j < i; j++)
+				{
+					sum += L[i][j]*Y[j-1][k];
+				}
+				Y[i][k] = (B[i][k]- sum)/L[i][i];
+			}
+			
+			for(int i = ARowDim - 1; i > -1 ; i--)
+			{
+				double sum = 0;
+				for (int j = i + 1; j < ARowDim +1 ;  j++)
+				{
+					sum += L[j][i]*X[-ARowDim+j-1][k];
+				}
+			  X[i][k] = (Y[i-1][k]- sum)/(L[i][i]);	
+			}
+		}
+		
+		return X;
+
+	}
+	
+	private static double[][] computeLMatrix(double[][] A)
+	{
+		matrixPrint(A);
+		double[][] L = new double[A.length][A[0].length];
+		
+		for(int j =0; j < L.length; j++)
+		{
+			for(int i =0; i < L[0].length; i++)
+			{
+				if(A[i][j] != 0)
+				{
+					firstNonZero.add(new Integer(i));
+					if((j-i)> halfBandwidth)
+					{
+						halfBandwidth = j -i ; 
+					}
+				}
+				else
+				{
+					System.out.println("All Zero Row!!!");
+				}
+			}
+		}
+		
+	 double rowSquared = 0;
+	 for (int j = 1; j < A.length +1; j++)
+	 {
+		 for(int k = firstNonZero.get(j-1); k <= j-1; k++)
+		 {
+			 rowSquared += Math.pow(L[j-1][k], 2); 
+		 }
+		 
+		 L[j][j] = Math.sqrt(L[j][j] - rowSquared);
+		 
+		 double dotProduct = 0;
+		 for(int i = j+1; i < A.length +1; i++)
+		 {
+			 for (int s = Math.max(firstNonZero.get(i-1), firstNonZero.get(j-1)); s < j; s++ )
+			 {
+				 dotProduct += L[i][s]*L[j][s];
+			 }
+			 
+			 L[i][j] = (L[i][j]-dotProduct)/L[j][j];
+			
+		 }
+		 
+		 
+	 }
+	 return L;
+		
+		
 	}
 	
 	/*
@@ -319,7 +475,6 @@ public class Assignment1
 		}
 
 		return sum;
-
 	}
 
 }

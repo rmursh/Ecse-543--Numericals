@@ -8,7 +8,6 @@ public class AdvancedDifferenceSolver {
 	private final static double CORE_POTENTIAL = 110;
 	private final static double MIN_RESIDUAL = 0.0001;
 	
-	private double h;
 	public double[][] mesh;
 	private double[] horizontalLines, verticalLines;
 	
@@ -17,6 +16,7 @@ public class AdvancedDifferenceSolver {
 		this.horizontalLines = horizontalLines;
 		this.verticalLines = verticalLines;
 		generateMesh();	
+		//Assignment1.matrixPrint(mesh);
 	}
 	
 	public double[][] getMesh()
@@ -27,17 +27,17 @@ public class AdvancedDifferenceSolver {
 	public void generateMesh()
 	{
 		mesh = new double[horizontalLines.length][verticalLines.length];
-		for(int i = 0; i < mesh.length; i++)
+		for(int x = 0; x < verticalLines.length; x++)
 		{
-			for(int j =0; j < mesh[0].length; j++)
+			for(int y =0; y < horizontalLines.length; y++)
 			{
-				if((j <= (int)(CORE_WIDTH/h))&&(i <= (int)(CORE_HEIGHT/h)))
+				if((x <= (CORE_WIDTH))&&(y <= (CORE_HEIGHT)))
 				{
-					mesh[i][j] = CORE_POTENTIAL;
+					mesh[x][y] = CORE_POTENTIAL;
 				}
 				else
 				{
-					mesh[i][j] = 0;
+					mesh[x][y] = 0;
 				}
 			}
 		}
@@ -67,6 +67,8 @@ public class AdvancedDifferenceSolver {
 		int numIterations = 0;
 		//double maximumResidual = computeMaximumResidual(0);
 		//System.out.println(maximumResidual);
+		//iterateSOR(w);
+		//Assignment1.matrixPrint(mesh);
 		//double residueOld  = iterateSOR(w);//mesh[(int)(0.06/h)][(int)(0.04/h)];
 		while (computeMaximumResidual()> MIN_RESIDUAL)
 		{
@@ -75,14 +77,22 @@ public class AdvancedDifferenceSolver {
 			numIterations++;
 			//maximumResidual = computeMaximumResidual(maximumResidual);
 		}
-		return numIterations+1;
+		return numIterations;
 	}
 	
 	
 	public double getPotentialAt(double x, double y)
 	{
-		int xPoint = (int) verticalLines[(int) x];
-		int yPoint = (int)verticalLines[(int) y];
+		int xPoint = 0, yPoint = 0;
+		for(int i =0; i < verticalLines.length ; i++)
+		{
+			if(verticalLines[i] == x) xPoint = i;
+		}
+		for(int i =0; i < horizontalLines.length ; i++)
+		{
+			if(horizontalLines[i] == y) yPoint = i;
+		}
+		
 		return mesh[xPoint][yPoint];
 	}
 	
@@ -90,9 +100,9 @@ public class AdvancedDifferenceSolver {
 	{
 		for (int y = 1; y < horizontalLines.length - 1; y++)
 		{
-			for(int x = 1; x < verticalLines.length -1; x++)
+			for(int x = 1; x < verticalLines.length - 1; x++)
 			{
-				if((horizontalLines[x] > (CORE_HEIGHT))||(verticalLines[x] > (CORE_WIDTH)))
+				if((horizontalLines[y] > (CORE_HEIGHT))||(verticalLines[x] > (CORE_WIDTH)))
 				{
 					double temp1 = verticalLines[x] - verticalLines[x-1];
 					double temp2 = horizontalLines[y+1] - horizontalLines[y];
@@ -102,8 +112,8 @@ public class AdvancedDifferenceSolver {
 					mesh[y][x] = ((mesh[y][x-1]/(temp1*(temp1+temp3))) 
 							   + (mesh[y][x+1]/(temp3*(temp1+temp3))) 
 							   + (mesh[y-1][x]/(temp4*(temp2+temp4))) 
-							   + (mesh[y+1][x]/(temp2*(temp2+temp4))))
-							   /((1/(temp1*temp3))+(1/(temp2*temp4)));
+							   + (mesh[y+1][x]/(temp2*(temp2+temp4)))) 
+							   / ((1/(temp1*temp3))+(1/(temp2*temp4)));
 				}
 			}
 		}
@@ -112,28 +122,32 @@ public class AdvancedDifferenceSolver {
 
 	private double computeMaximumResidual()
 	{
-		double maximumResidual =0;
-		for (int y = 1; y < horizontalLines.length - 1 - 1; y++)
+		double maximumResidual = 0;
+		for (int y = 1; y < horizontalLines.length - 1; y++)
 		{
 			for(int x = 1; x < verticalLines.length - 1; x++)
 			{
-				if((horizontalLines[x] > (CORE_HEIGHT))||(horizontalLines[x] > (CORE_HEIGHT)))
+				if((horizontalLines[y] > (CORE_HEIGHT))||(verticalLines[x] > (CORE_WIDTH)))
 				{
 					double temp1 = verticalLines[x] - verticalLines[x-1];
 					double temp2 = horizontalLines[y+1] - horizontalLines[y];
 					double temp3 = verticalLines[x+1] - verticalLines[x];
 					double temp4 = horizontalLines[y] - horizontalLines[y-1];
 					
-					double residual = (mesh[y][x-1]/(temp1*(temp1+temp3)) + mesh[y][x+1]/(temp3*(temp1+temp3)) + mesh[y-1][x]/(temp4*(temp2+temp4)) + mesh[y+1][x]/(temp2*(temp2+temp4))) - (1/(temp1*temp3) + 1/(temp2*temp4))*mesh[y][x];
+					double residual = ((mesh[y][x-1]/(temp1*(temp1+temp3)) 
+							           + mesh[y][x+1]/(temp3*(temp1+temp3)) 
+							           + mesh[y-1][x]/(temp4*(temp2+temp4)) 
+							           + mesh[y+1][x]/(temp2*(temp2+temp4))))
+							           - ((1/(temp1*temp3)) + (1/(temp2*temp4)))*mesh[y][x];
 					residual = Math.abs(residual);
 					if (residual > maximumResidual)
 					{
 						maximumResidual = residual;
 					}
-
 				}
 			}
 		}
+		//System.out.println(maximumResidual);
 		return maximumResidual;
 
 	}
