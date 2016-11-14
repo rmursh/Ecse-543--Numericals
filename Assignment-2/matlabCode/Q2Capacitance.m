@@ -40,4 +40,3 @@ epsilon = 8.854187817620e-12;
 voltageSquared = 12100;
 Capacitance = totalEnergy*(epsilon * 4 / voltageSquared);
 % 
-Capacitance
