@@ -9,8 +9,7 @@ tolerance = 0.000001;
 i = 0;
 x = 0;
 
-while (abs(newtonRhapson(x,Rg)/newtonRhapson(0,Rg)) > tolerance)
+while (abs(newtonRhapson(x,Rg)/newtonRhapson(0,Rg)) >= tolerance)
     i = i + 1;
     x = x - newtonRhapson(x, Rg)/newtonRhapsonDer(x,Rg);  
 end
-
