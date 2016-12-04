@@ -6,10 +6,15 @@ La = 0.5*(10^(-2));
 Lc = 30*(10^(-2));
 Rg = La/SUo;
 tolerance = 0.000001; 
-i = 0;
+iterations = 0;
 x = 0;
-
-while (abs(newtonRhapson(x,Rg)/newtonRhapson(0,Rg)) >= tolerance)
-    i = i + 1;
+xlist = [];
+while (abs(newtonRhapson(x,Rg)/newtonRhapson(0,Rg)) > tolerance)
+    iterations = iterations + 1;
     x = x - newtonRhapson(x, Rg)/newtonRhapsonDer(x,Rg);  
+    xlist = [xlist, x];
 end
+xlist = xlist';
+ilist = 1 : iterations;
+ilist = ilist';
+plot(ilist, xlist);
