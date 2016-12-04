@@ -1,25 +1,24 @@
+E = 0.2;    
+R = 512.0;
+Isa = 0.0000006;
+Isb = 0.0000012;
+V1 = 0.0;
+V2 = 0.0;
+k = 0;
 
-
-
-function f = newRap (E,R,V1,V2,Isa,Isb,k);    
-    f1 = V1 - E + R * Isa * (math.exp((V1 - V2) / 0.025) - 1.0);
-    f2 = Isa * ((exp((V1 - V2) / 0.025) - 1.0)) - Isb * (exp(V2 / 0.025) - 1.0);   
-    f1V1Prime = 1.0 + (R * Isa / 0.025) * (exp((V1 - V2) / 0.025));
-    f1V2Prime = -1.0 * (R * Isa / 0.025) * (exp((V1 - V2) / 0.025));
-    f2V1Prime = (Isa / 0.025) * (exp((V1 - V2) / 0.025));
-    f2V2Prime = -1.0 * (Isa / 0.025) * (exp((V1 - V2) / 0.025)) - (Isb / 0.025) * (exp(V2 / 0.025));  
-    V = [V1,V2];
-    f = [f1,f2];
-    for y  = 1:2
-        for x = 1:2
-            J = 
-    J = [[None for x in range (2)] for y in range(2)]    
-    J[0][0] = f1V1Prime;
-    J[0][1] = f1V2Prime;
-    J[1][0] = f2V1Prime;
-    J[1][1] = f2V2Prime ;   
-    invJ = matInverse(J)
-    V = matrixAddorSub(matTranspose(scalarMult(-1.0,matrixMult(invJ,f))),V,'a') 
-    print ('V1 : ' + str(V[0][0])+ ' V')
-    print ('V2 : ' + str(V[1][0])+ ' V')    
-    return V
+V = newRapCircuit(E,R,V1,V2,Isa,Isb,k);
+Vlist = [V]
+f1 = V(1,1) - E + R * Isa *(exp((V(1,1) - V(2,1))/0.025) - 1.0);
+f1list = [f1list, f1];
+while (f1 > 0)
+    k = k + 1;
+    V = newRapCircuit(E,R,V(1,1),V(2,1),Isa,Isb,k);
+    f1 = V(1,1) - E + R * Isa *(exp((V(1,1) - V(2,1))/0.025) - 1.0);
+    f2 = Isa * ((exp((V(1,1) - V(2,1)) / 0.025) - 1.0)) - Isb * (exp(V(2,1) / 0.025) - 1.0) ;
+    f1list = [f1list, f1];
+    f2list = [f2list, f1];
+end
+f1 = V(1,1) - E + R * Isa * (exp((V(1,1) - V(2,1)) / 0.025) - 1.0);
+f2 = Isa * ((exp((V(1,1) - V(2,1)) / 0.025) - 1.0)) - Isb * (exp(V(2,1) / 0.025) - 1.0) ;
+f1list = [f1list, f1];
+f2list = [f2list, f1];
