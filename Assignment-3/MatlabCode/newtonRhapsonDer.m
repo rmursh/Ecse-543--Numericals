@@ -5,6 +5,7 @@ Y = [0.0, 14.7, 36.5, 71.7, 121.4, 197.4, 256.2,348.7,540.6,1062.8,2318.0,4781.9
 xx = 0:.01:1.9;
 P1 = piecelin(X,Y,xx);
 Ydiff = polyder(P1);
-%plot(Ydiff,xx);
+xx = 0:.01:1.88;
+plot(Ydiff,xx);
 %plot(xx,P1,xx(index),Y_point,'o');
 f = Rg + (0.3*polyval(Ydiff, B))/(1/100^2);

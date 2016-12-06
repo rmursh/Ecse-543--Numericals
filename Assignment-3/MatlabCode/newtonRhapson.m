@@ -9,7 +9,6 @@ P1 = piecelin(X,Y,xx);
 % index = find(xx==flux);
 % P1(1);
 % Y_point = P1(index);
-%plot(P1,xx);
 
 f = Rg*flux + 0.3*polyval(P1,B) - 8000; 
 %f = Rg*flux + 0.3*polyval(P1,flux) - 8000; 

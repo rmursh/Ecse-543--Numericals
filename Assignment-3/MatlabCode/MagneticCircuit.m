@@ -17,4 +17,4 @@ end
 xlist = xlist';
 ilist = 1 : iterations;
 ilist = ilist';
-plot(ilist, xlist);
+%plot(ilist, xlist);
