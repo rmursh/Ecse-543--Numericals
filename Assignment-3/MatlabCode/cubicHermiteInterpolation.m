@@ -1,10 +1,4 @@
 function v = cubicHermiteInterpolation(x,y,u)
-%PCHIPTX Textbook piecewise cubic Hermite interpolation.
-% v = pchiptx(x,y,u) finds the shape-preserving piecewise
-% P(x), with P(x(j)) = y(j), and returns v(k) = P(u(k)).
-%
-% See PCHIP, SPLINETX.
-% First derivatives
 h = diff(x);
 delta = diff(y)./h;
 d = calculateSlopeInternal(h,delta);
