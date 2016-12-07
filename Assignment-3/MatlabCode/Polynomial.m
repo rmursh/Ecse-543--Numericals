@@ -2,7 +2,6 @@ X = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0];
 Y = [0.0, 14.7, 36.5, 71.7, 121.4, 197.4];
 xx = 0:.0001:1.9;
 %P1 = Lagrange(X,Y);
-Yout = polyval(P1,xx);
 figure;
 plot(Lagrange(X,Y,xx),xx);
 

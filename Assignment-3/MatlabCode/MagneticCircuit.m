@@ -18,3 +18,4 @@ xlist = xlist';
 ilist = 1 : iterations;
 ilist = ilist';
 %plot(ilist, xlist);
+xSub = successiveSubstitution(1e-6, 1e-6);
